@@ -1,3 +1,65 @@
+import sqlite3
+
+try:
+    #Crear base de datos
+    con = sqlite3.connect("ejercicio.db")
+    con.execute("PRAGMA foreign_keys = ON")
+    cur = con.cursor()
+
+
+    #Crear tablas
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios(
+            id_usuario INTEGER PRIMARY KEY,
+            nickName TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            nombre_usuario TEXT NOT NULL,
+            apellido_usuario TEXT NOT NULL,
+            email_usuario TEXT NOT NULL
+        )
+    ''')
+
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS tipo_cliente(
+            id_type INTEGER PRIMARY KEY,
+            tipo_cliente TEXT
+        )
+    ''')
+
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS clientes(
+            id_cliente INTEGER PRIMARY KEY,
+            run TEXT NOT NULL UNIQUE,
+            nombre_cliente TEXT NOT NULL,
+            apellido_cliente TEXT NOT NULL,
+            direccion TEXT NOT NULL,
+            telefono INTEGER NOT NULL,
+            email_cliente TEXT NOT NULL,
+            id_type INTEGER NOT NULL,
+            FOREIGN KEY (id_type) REFERENCES tipo_cliente(id_type)
+        )
+    ''')
+
+    #Ingresar datos iniciales 
+    cur.execute("SELECT COUNT(*) FROM tipo_cliente")
+    count = cur.fetchone()[0]
+    if count == 0:
+        tipo_clientes = [
+            (101, 'plata'),
+            (102, 'oro'),
+            (103, 'platino'),
+        ]
+        cur.executemany("INSERT INTO tipo_cliente (id_type, tipo_cliente) VALUES (?, ?)", tipo_clientes)
+
+#Confirmar cambios, manejar excepciones y cerar conexión
+    con.commit()
+
+except:
+    print("Error SQLite:", sqlite3.Error)
+    if con:
+        con.rollback()        
+
+
 clientes = {}
 usuarios = {}
 idcliente = 0
