@@ -70,13 +70,17 @@ def main():
         db.connect()
         
         db.create_tables()
-        
-        if 
-        tipo_clientes = [
-            ('12345678-9', 'Juan', 'Pérez', 'Calle Falsa 123', 987654321, 'juan.perez@example.com', 1),
-            ('98765432-1', 'Ana', 'García', 'Avenida Siempre Viva 742', 123456789, 'ana.garcia@example.com', 2)
-        ]
-        db.insert_data('clientes', clientes)
+    
+
+        db.execute("SELECT COUNT(*) FROM tipo_cliente")
+        count = db.fetchone()[0]
+        if count == 0:
+            tipo_clientes = [
+                (101, 'plata'),
+                (102, 'oro'),
+                (103, 'platino'),
+            ]
+            db.insert_data('tipo_cliente', tipo_clientes)
         
         # Confirmar la transacción
         db.commit()

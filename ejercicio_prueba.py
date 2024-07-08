@@ -1,4 +1,5 @@
 import sqlite3
+import getpass
 
 try:
     #Crear base de datos
@@ -51,7 +52,7 @@ try:
         ]
         cur.executemany("INSERT INTO tipo_cliente (id_type, tipo_cliente) VALUES (?, ?)", tipo_clientes)
 
-#Confirmar cambios, manejar excepciones y cerar conexión
+#Confirmar cambios y manejar excepciones
     con.commit()
 
 except:
@@ -272,12 +273,41 @@ def menuUsuarios():
     print("       3.-  Salir               ")
     print("================================")
 
+def contraseniaSegura():
+    while True:
+        contrasenia = getpass.getpass('Ingrese contraseña (debe tener letras, símbolos y al menos un número): ')
+
+        nums = 0
+        for i in range(10):
+            num = str(i)
+            nums += contrasenia.count(num)
+
+        if len(contrasenia) >= 8 and not contrasenia.isalnum() and nums>=1:
+            confirm_pass = input('Confirme su contraseña: ')
+            if contrasenia == confirm_pass:
+                print('Contraseña aceptada')
+                return
+            else: print('Las contraseñas no coinciden')
+        else: print('No se complen todas las condiciones')
+    
+
+
 def ingresoUsuarios():
     print("=======================================")
     print("        INGRESO DE USUARIO             ")
     print("=======================================")
+
     username = input( "INGRESE NOMBRE DE USUARIO:  ")
-    clave = input( "INGRESE PASSWORD         : ")
+    cur.execute('SELECT * FROM users WHERE username = ?', (username,))
+    existing_user = cur.fetchone()
+    if existing_user:
+            print("El usuario ya existe.")
+            return
+    else:
+        clave = contraseniaSegura()
+    
+
+
     nombre = input(   "INGRESE NOMBRE           : ")
     apellidos = input("INGRESE APELLIDOS        : ")
     correo = input(   "INGRESE CORREO           : ")
@@ -288,17 +318,19 @@ def ingresoUsuarios():
     usuario = [codigo,username,clave,nombre,apellidos,correo]
     usuarios[username] = usuario
 
+#Evaluar el tipo de dato de entrada
+def inputInt():
+    while True:
+        try:
+            opUsu = int(input("INGRESE OPCIÓN: "))
+            return opUsu
+        except:
+            print('Debe ingresar un número')
 
 while True:
     menuUsuarios()
 
-    #Evaluar el tipo de dato de entrada
-    while True:
-        try:
-            opUsu = int(input("INGRESE OPCIÓN: "))
-            break
-        except:
-            print('Debe ingresar un número')
+    opUsu = inputInt()
 
     if opUsu == 1:
         user = input("Ingrese nombre de usuario: ")
@@ -310,7 +342,7 @@ while True:
                 input("Presiona ENTRAR para ingresar al Menú Principal.")
                 while True:  # Bucle para el Menú Principal
                     menuprincipal()
-                    op = int(input("INGRESE OPCIÓN: "))
+                    op = inputInt()
                     if op == 1:
                         ingresardatos()
                     elif op == 2:
